@@ -34,5 +34,5 @@ cmake --build $PROJ_build
 cmake --build $PROJ_build --target install
 
 cmake -S . -B build -DCMAKE_PREFIX_PATH="$local_install"
-cmake --build build
+cmake --build build -j$(nproc)
 
