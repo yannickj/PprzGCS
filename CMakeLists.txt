@@ -10,8 +10,22 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
+if(NOT BUILD_FOR_DEB)
+    set(BUILD_FOR_DEB OFF)
+endif()
+
+
 if(NOT DEFINED APP_DATA_PATH)
-    get_filename_component(APP_DATA_PATH "./data/" ABSOLUTE)
+
+  if(BUILD_FOR_DEB)
+      set(APP_DATA_PATH /usr/share/pprzgcs)
+  else()
+      get_filename_component(APP_DATA_PATH "./data/" ABSOLUTE)
+  endif()
+endif()
+
+if(NOT PROJ_ON_SYSTEM)
+    set(PROJ_ON_SYSTEM OFF)
 endif()
 
 add_definitions(-DAPP_DATA_PATH="${APP_DATA_PATH}")
@@ -20,7 +34,13 @@ find_package(Boost COMPONENTS system)
 
 find_package(Qt5 5.11 COMPONENTS Widgets Xml Network Svg REQUIRED)
 
-#find_package(PROJ4 REQUIRED)
+
+if(NOT PROJ_ON_SYSTEM)
+  find_package(PROJ4 REQUIRED)
+  set(PROJ_LINK "")
+else()
+  set(PROJ_LINK proj)
+endif()
 
 find_package(pprzlink++ REQUIRED)
 
@@ -125,7 +145,7 @@ add_executable(${PROJECT_NAME} ${SOURCE})
 
 target_link_libraries(${PROJECT_NAME}
     pprzlink++
-    proj
+    ${PROJ_LINK}
     Qt5::Widgets
     Qt5::Xml
     Qt5::Network
